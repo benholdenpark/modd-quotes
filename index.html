@@ -151,8 +151,18 @@
   }
 
   .axis-line-x { flex: 1; height: 1px; background: var(--line); margin: 0 10px; min-width: 16px; }
-  .meter-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 560px) { .meter-wrap { grid-template-columns: 1fr; } .meter-row { gap: 6px; } .axis-y { width: 26px; } }
+  .meter-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  @media (max-width: 560px) {
+    .meter-row { gap: 4px; }
+    .axis-y { width: 20px; }
+    .axis-y .axis-text { font-size: 10px; letter-spacing: 0; }
+    .meter-wrap { gap: 5px; }
+    .quadrant { gap: 2px; padding: 6px; border-radius: 12px; }
+    .word-btn { padding: 4px 1px; font-size: 8.5px; border-radius: 6px; }
+    .word-btn .en { display: none; }
+    .axis-x .axis-text-x { font-size: 10px; }
+  }
 
   .quadrant {
     display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
