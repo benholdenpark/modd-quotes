@@ -72,7 +72,7 @@
     width: 100%; max-width: 720px; position: relative; z-index: 1;
   }
 
-  .top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 22px; }
+  .top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
   header { text-align: left; flex: 1; min-width: 0; }
 
   h1 {
@@ -84,10 +84,18 @@
     letter-spacing: -0.01em;
     color: var(--ink);
     text-shadow: 0 0 24px rgba(198,168,232,0.35);
+    word-break: keep-all;
+    overflow-wrap: normal;
   }
 
-  header p { font-size: 14.5px; color: var(--ink-soft); margin: 0 0 4px; }
+  header p { font-size: 14.5px; color: var(--ink-soft); margin: 0 0 4px; word-break: keep-all; overflow-wrap: normal; }
   .source-note { display: block; font-size: 12px; color: var(--ink-soft); opacity: 0.75; margin: 0; }
+
+  @media (max-width: 480px) {
+    .top-row { flex-direction: column; align-items: stretch; }
+    .header-btns { justify-content: flex-end; }
+    h1 { font-size: 22px; }
+  }
 
   .install-hint {
     appearance: none; border: none; background: none; padding: 0;
@@ -207,6 +215,24 @@
   #mainView { display: block; }
 
   .stage { min-height: 220px; display: flex; align-items: center; }
+
+  .site-footer {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+  }
+
+  .site-footer p {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+    opacity: 0.75;
+    margin: 0 0 6px;
+  }
+
+  .footer-credit { font-weight: 700; opacity: 0.9 !important; }
+  .footer-copy { margin-bottom: 0 !important; }
 
   .placeholder {
     width: 100%; text-align: center; color: var(--ink-soft); font-size: 16px;
@@ -380,6 +406,13 @@
     <div class="stage" id="stage">
       <div class="placeholder">감정 단어를 눌러보시면<br>그 마음에게 건네는 문장을 보여드릴게요</div>
     </div>
+
+    <footer class="site-footer">
+      <p>무드 미터의 감정 단어를 바탕으로 만든 개인용 감정 기록 웹앱입니다.</p>
+      <p>기록되는 모든 데이터는 사용자 계정에만 저장되며, 다른 사람과 공유되지 않습니다.</p>
+      <p class="footer-credit">Made with &#9825; by Jae-young Park</p>
+      <p class="footer-copy">&copy; 2026 Jae-young Park. All rights reserved.</p>
+    </footer>
   </div>
 
   <div id="logView" class="hidden">
