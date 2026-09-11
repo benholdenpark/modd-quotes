@@ -490,6 +490,12 @@
         document.querySelectorAll('.word-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         render(btn.dataset.q, btn.dataset.word);
+        const stageEl = document.getElementById('stage');
+        if (stageEl) {
+          setTimeout(() => {
+            stageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        }
       });
     });
   }
