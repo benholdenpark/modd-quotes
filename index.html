@@ -280,6 +280,38 @@
   }
   .close-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
 
+  .install-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    background: rgba(20, 14, 36, 0.6);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  }
+  .install-overlay.hidden { display: none; }
+
+  .install-modal {
+    width: 100%; max-width: 380px;
+    background: rgba(45, 35, 66, 0.92);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    padding: 22px 20px;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.6);
+  }
+
+  .install-modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+  .install-modal-title {
+    font-family: 'Nanum Myeongjo', serif; font-weight: 700; font-size: 19px;
+    color: var(--ink); margin: 0;
+  }
+
+  .install-modal-text {
+    font-size: 14.5px; line-height: 1.7; color: var(--ink-soft);
+    margin: 0; white-space: pre-line;
+  }
+
+  .install-modal-text strong { color: var(--ink); }
+
   .log-panel {
     max-width: 720px; margin: 0 auto;
     background: rgba(255,255,255,0.10);
@@ -318,6 +350,7 @@
       <div class="today-note" id="todayNote"></div>
     </header>
     <div class="header-btns">
+      <button class="refresh-btn" id="installBtn" title="홈 화면에 추가" aria-label="홈 화면에 추가">&#8962;</button>
       <button class="refresh-btn" id="refreshBtn" title="새로고침" aria-label="새로고침">&#8635;</button>
       <button class="toggle-btn" id="toggleBtn">기록 보기</button>
     </div>
@@ -343,6 +376,16 @@
     </div>
     <div class="log-panel">
       <div id="logBody"></div>
+    </div>
+  </div>
+
+  <div id="installModalOverlay" class="hidden install-overlay">
+    <div class="install-modal">
+      <div class="install-modal-head">
+        <p class="install-modal-title">홈 화면에 추가하기</p>
+        <button class="close-btn" id="closeInstallBtn" aria-label="닫기">&#10005;</button>
+      </div>
+      <p class="install-modal-text" id="installModalText"></p>
     </div>
   </div>
 </div>
@@ -605,6 +648,51 @@
 
   toggleBtn.addEventListener('click', openLog);
   closeLogBtn.addEventListener('click', closeLog);
+
+  // ---- 홈 화면에 추가 ----
+  const installBtn = document.getElementById('installBtn');
+  const installOverlay = document.getElementById('installModalOverlay');
+  const installText = document.getElementById('installModalText');
+  const closeInstallBtn = document.getElementById('closeInstallBtn');
+
+  let deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+  });
+
+  function getInstallGuideText() {
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    const isAndroid = /Android/.test(ua);
+
+    if (isIOS) {
+      return '아이폰(사파리)에서 보고 계시네요.\n\n1. 화면 아래쪽 공유 버튼( ⬆︎ 이 그려진 사각형 아이콘 )을 눌러주세요.\n2. 메뉴를 아래로 내려 "홈 화면에 추가"를 선택해주세요.\n3. 오른쪽 위 "추가"를 누르면 완료돼요.';
+    }
+    if (isAndroid) {
+      return '안드로이드에서 보고 계시네요.\n\n1. 브라우저 오른쪽 위 점 3개(⋮) 메뉴를 눌러주세요.\n2. "홈 화면에 추가" 또는 "앱 설치"를 선택해주세요.\n3. 안내에 따라 추가를 눌러주시면 완료돼요.';
+    }
+    return '휴대폰 브라우저에서 이 페이지를 열면\n"홈 화면에 추가" 버튼으로 아이콘을 만들 수 있어요.\n\n지금 계신 이 화면(컴퓨터 등)에서는 지원되지 않아요.';
+  }
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      try { await deferredInstallPrompt.userChoice; } catch (e) {}
+      deferredInstallPrompt = null;
+      return;
+    }
+    installText.textContent = getInstallGuideText();
+    installOverlay.classList.remove('hidden');
+  });
+
+  closeInstallBtn.addEventListener('click', () => {
+    installOverlay.classList.add('hidden');
+  });
+
+  installOverlay.addEventListener('click', (e) => {
+    if (e.target === installOverlay) installOverlay.classList.add('hidden');
+  });
 
   buildWordGrid();
 
