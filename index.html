@@ -25,7 +25,7 @@
   }
 
   * { box-sizing: border-box; }
-  html, body { height: 100%; }
+  html, body { height: auto; }
 
   body {
     margin: 0;
@@ -34,7 +34,7 @@
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    padding: 44px 18px 90px;
+    padding: 32px 16px 60px;
     position: relative;
     overflow-x: hidden;
     background: radial-gradient(ellipse 90% 60% at 20% 0%, #4B3B73 0%, transparent 55%),
@@ -68,16 +68,18 @@
     filter: blur(40px); z-index: 0; pointer-events: none;
   }
 
-  .page { width: 100%; max-width: 720px; position: relative; z-index: 1; }
+  .page {
+    width: 100%; max-width: 720px; position: relative; z-index: 1;
+  }
 
-  .top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 26px; }
-  header { text-align: left; flex: 1; }
+  .top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 22px; }
+  header { text-align: left; flex: 1; min-width: 0; }
 
   h1 {
     font-family: 'Nanum Myeongjo', serif;
     font-weight: 700;
-    font-size: 28px;
-    line-height: 1.45;
+    font-size: 26px;
+    line-height: 1.4;
     margin: 0 0 8px;
     letter-spacing: -0.01em;
     color: var(--ink);
@@ -85,11 +87,13 @@
   }
 
   header p { font-size: 14.5px; color: var(--ink-soft); margin: 0 0 4px; }
-  .source-note { font-size: 12px; color: var(--ink-soft); opacity: 0.75; margin: 0; }
+  .source-note { display: block; font-size: 12px; color: var(--ink-soft); opacity: 0.75; margin: 0; }
   .today-note { margin-top: 10px; font-size: 14px; color: var(--ink-soft); }
   .today-note strong { color: var(--ink); font-weight: 700; }
 
-  .toggle-btn {
+  .header-btns { display: flex; gap: 8px; flex-shrink: 0; }
+
+  .toggle-btn, .refresh-btn {
     appearance: none; flex-shrink: 0;
     border: 1px solid var(--line);
     background: rgba(255,255,255,0.08);
@@ -101,9 +105,10 @@
     cursor: pointer; white-space: nowrap;
     transition: background 0.2s ease, transform 0.15s ease;
   }
-  .toggle-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+  .refresh-btn { padding: 12px 14px; font-size: 16px; line-height: 1; }
+  .toggle-btn:hover, .refresh-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
 
-  .meter-row { display: flex; align-items: stretch; gap: 10px; margin-bottom: 32px; }
+  .meter-row { display: flex; align-items: stretch; gap: 10px; margin-bottom: 28px; }
 
   .axis-y {
     display: flex;
@@ -154,13 +159,13 @@
   .meter-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
   @media (max-width: 560px) {
-    .meter-row { gap: 4px; }
-    .axis-y { width: 20px; }
+    .meter-row { gap: 6px; }
+    .axis-y { width: 22px; }
     .axis-y .axis-text { font-size: 10px; letter-spacing: 0; }
-    .meter-wrap { gap: 5px; }
-    .quadrant { gap: 2px; padding: 6px; border-radius: 12px; }
-    .word-btn { padding: 4px 1px; font-size: 8.5px; border-radius: 6px; }
-    .word-btn .en { display: none; }
+    .meter-wrap { gap: 6px; }
+    .quadrant { gap: 3px; padding: 8px; border-radius: 14px; }
+    .word-btn { padding: 6px 2px; font-size: 10px; border-radius: 7px; }
+    .word-btn .en { font-size: 8px; }
     .axis-x .axis-text-x { font-size: 10px; }
   }
 
@@ -226,11 +231,13 @@
     outline: 2px solid var(--ink); outline-offset: 2px;
   }
 
-  .stage { min-height: 240px; display: flex; align-items: center; }
+  #mainView { display: block; }
+
+  .stage { min-height: 220px; display: flex; align-items: center; }
 
   .placeholder {
     width: 100%; text-align: center; color: var(--ink-soft); font-size: 16px;
-    padding: 50px 20px; border: 1px dashed var(--line); border-radius: 20px;
+    padding: 46px 20px; border: 1px dashed var(--line); border-radius: 20px;
     background: rgba(255,255,255,0.05);
     backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   }
@@ -242,7 +249,7 @@
     border: 1px solid rgba(255,255,255,0.22);
     border-left: 3px solid var(--current);
     border-radius: 6px 24px 24px 6px;
-    padding: 36px 30px;
+    padding: 32px 26px;
     opacity: 0; transform: translateY(8px);
     animation: rise 0.6s ease forwards;
     box-shadow: 0 20px 60px -20px rgba(0,0,0,0.45);
@@ -250,18 +257,18 @@
 
   @keyframes rise { to { opacity: 1; transform: translateY(0); } }
 
-  .quote-label { font-size: 14px; font-weight: 700; color: var(--current); margin: 0 0 18px; letter-spacing: 0.02em; }
+  .quote-label { font-size: 14px; font-weight: 700; color: var(--current); margin: 0 0 16px; letter-spacing: 0.02em; }
 
   .quote-text {
     font-family: 'Nanum Myeongjo', serif;
-    font-size: 26px; line-height: 1.8; font-weight: 700;
-    color: var(--ink); margin: 0 0 28px; letter-spacing: -0.01em;
+    font-size: 22px; line-height: 1.7; font-weight: 700;
+    color: var(--ink); margin: 0 0 24px; letter-spacing: -0.01em;
     text-shadow: 0 0 20px rgba(0,0,0,0.2);
   }
 
   .quote-text .hl { color: var(--current); }
 
-  .card-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .card-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 
   .again-btn {
     appearance: none; border: none; background: none; color: var(--current);
@@ -278,7 +285,7 @@
   .save-btn:hover { background: var(--current); color: #241B3A; }
   .save-msg { font-size: 14px; color: var(--ink-soft); }
 
-  @media (max-width: 420px) { .quote-text { font-size: 21px; } h1 { font-size: 23px; } }
+  #logView { display: block; }
 
   .log-panel {
     background: rgba(255,255,255,0.10);
@@ -317,7 +324,10 @@
       <p class="source-note">출처: 무드 미터(Mood Meter) — &lt;감정의 발견&gt;, 마크 브래킷</p>
       <div class="today-note" id="todayNote"></div>
     </header>
-    <button class="toggle-btn" id="toggleBtn">기록 보기</button>
+    <div class="header-btns">
+      <button class="refresh-btn" id="refreshBtn" title="새로고침" aria-label="새로고침">&#8635;</button>
+      <button class="toggle-btn" id="toggleBtn">기록 보기</button>
+    </div>
   </div>
 
   <div id="mainView">
@@ -602,6 +612,8 @@
   }
 
   const toggleBtn = document.getElementById('toggleBtn');
+  const refreshBtn = document.getElementById('refreshBtn');
+  refreshBtn.addEventListener('click', () => { location.reload(); });
   const mainView = document.getElementById('mainView');
   const logView = document.getElementById('logView');
   let showingLog = false;
