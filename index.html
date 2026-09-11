@@ -284,6 +284,33 @@
 
   .quote-text .hl { color: var(--current); }
 
+  .reflection-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+  .reflection-label span { font-weight: 500; opacity: 0.7; }
+
+  .reflection-input {
+    width: 100%;
+    resize: vertical;
+    min-height: 64px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .reflection-input::placeholder { color: var(--ink-soft); opacity: 0.7; }
+  .reflection-input:focus { outline: none; border-color: var(--current); }
+
   .card-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 
   .again-btn {
@@ -301,7 +328,7 @@
   .save-btn:hover { background: var(--current); color: #241B3A; }
   .save-msg { font-size: 14px; color: var(--ink-soft); }
 
-  #logView {
+  #logView, #chartView {
     position: fixed;
     inset: 0;
     z-index: 200;
@@ -312,7 +339,7 @@
                 radial-gradient(ellipse 90% 70% at 50% 100%, #7A5C82 0%, transparent 60%),
                 linear-gradient(160deg, #211A3B 0%, #3B2C5C 35%, #5C4270 65%, #7C5470 100%);
   }
-  #logView.hidden { display: none; }
+  #logView.hidden, #chartView.hidden { display: none; }
 
   .log-screen-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -378,6 +405,56 @@
 
   .log-empty { color: var(--ink-soft); font-size: 15px; padding: 20px 0; text-align: center; }
 
+  .chart-desc { font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 18px; }
+
+  .chart-legend {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 20px;
+    margin-top: 16px; font-size: 13px; color: var(--ink-soft);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-dot[data-q="red"] { background: var(--red); }
+  .legend-dot[data-q="yellow"] { background: var(--yellow); }
+  .legend-dot[data-q="blue"] { background: var(--blue); }
+  .legend-dot[data-q="green"] { background: var(--green); }
+
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .cal-month-label { font-family: 'Nanum Myeongjo', serif; font-weight: 700; font-size: 18px; color: var(--ink); margin: 0; }
+  .cal-nav {
+    appearance: none; border: 1px solid var(--line); background: rgba(255,255,255,0.08);
+    color: var(--ink); width: 34px; height: 34px; border-radius: 10px;
+    font-size: 16px; cursor: pointer; transition: background 0.2s ease;
+  }
+  .cal-nav:hover { background: rgba(255,255,255,0.15); }
+
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .cal-weekdays { margin-bottom: 6px; }
+  .cal-weekday { text-align: center; font-size: 11px; font-weight: 700; color: var(--ink-soft); padding: 2px 0; }
+
+  .cal-cell {
+    appearance: none; aspect-ratio: 1; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: var(--ink-soft);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    cursor: default;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .cal-cell.empty { border: none; background: none; }
+  .cal-cell.has-mood { cursor: pointer; color: #fff; font-weight: 700; border-color: transparent; }
+  .cal-cell.has-mood:hover { filter: brightness(1.15); transform: scale(1.06); }
+  .cal-cell.is-today { outline: 2px solid #fff; outline-offset: -2px; }
+  .cal-cell.has-mood[data-q="red"] { background: var(--red); }
+  .cal-cell.has-mood[data-q="yellow"] { background: var(--yellow); color: #4A3B10; }
+  .cal-cell.has-mood[data-q="blue"] { background: var(--blue); }
+  .cal-cell.has-mood[data-q="green"] { background: var(--green); }
+
+  .cal-detail-card { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .cal-detail-card .log-date { display: block; margin-bottom: 8px; }
+
   table.log-table { width: 100%; border-collapse: collapse; }
   .log-table th { text-align: left; font-size: 13px; font-weight: 700; color: var(--ink-soft); padding: 0 8px 12px; border-bottom: 1px solid var(--line); }
   .log-table td { font-size: 14px; padding: 13px 8px; border-bottom: 1px solid rgba(255,255,255,0.12); vertical-align: top; color: var(--ink); }
@@ -390,6 +467,28 @@
   .chip-dot[data-q="blue"] { background: var(--blue); }
   .chip-dot[data-q="green"] { background: var(--green); }
   .log-quote { font-family: 'Nanum Myeongjo', serif; line-height: 1.6; }
+
+  .log-reflection {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    white-space: pre-line;
+  }
+  .log-reflection-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    background: rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 1px 6px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
   .del-link { appearance: none; border: none; background: none; color: var(--ink-soft); font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
   .del-link:hover { color: var(--ink); }
   .hidden { display: none; }
@@ -409,6 +508,7 @@
       <button class="refresh-btn" id="shareBtn" title="공유하기" aria-label="공유하기">&#128228;</button>
       <button class="refresh-btn" id="refreshBtn" title="새로고침" aria-label="새로고침">&#8635;</button>
       <button class="toggle-btn" id="toggleBtn">기록 보기</button>
+      <button class="toggle-btn" id="chartToggleBtn">캘린더 보기</button>
       <span class="share-toast hidden" id="shareToast"></span>
     </div>
   </div>
@@ -440,6 +540,17 @@
     </div>
     <div class="log-panel">
       <div id="logBody"></div>
+    </div>
+  </div>
+
+  <div id="chartView" class="hidden">
+    <div class="log-screen-header">
+      <p class="log-screen-title">감정 캘린더</p>
+      <button class="close-btn" id="closeChartBtn" aria-label="닫기">&#10005;</button>
+    </div>
+    <div class="log-panel">
+      <p class="chart-desc">날짜별로 기록한 감정을 색으로 한눈에 볼 수 있어요. 색이 있는 날을 눌러보면 그날의 문장을 다시 볼 수 있어요.</p>
+      <div id="chartBody"></div>
     </div>
   </div>
 
@@ -662,6 +773,8 @@
       <div class="quote-card" style="--current:var(--${q});">
         <p class="quote-label">${word} ${quadLabel[q]}</p>
         <p class="quote-text">${text}</p>
+        <label class="reflection-label" for="reflectionInput">오늘의 성찰 <span>(선택)</span></label>
+        <textarea class="reflection-input" id="reflectionInput" rows="3" placeholder="이 감정에 대해 떠오르는 생각이나 오늘 있었던 일을 적어보세요"></textarea>
         <div class="card-actions">
           <button class="again-btn" id="again">다른 문장 보기</button>
           <button class="save-btn" id="saveBtn">오늘 기록에 저장</button>
@@ -672,11 +785,19 @@
     document.getElementById('again').addEventListener('click', () => render(q, word));
     document.getElementById('saveBtn').addEventListener('click', async () => {
       const key = getTodayKey();
-      records[key] = { mood: q, word, quoteText: text, savedAt: new Date().toISOString() };
+      const reflection = document.getElementById('reflectionInput').value.trim();
+      records[key] = { mood: q, word, quoteText: text, reflection, savedAt: new Date().toISOString() };
       await persistRecords();
       document.getElementById('saveMsg').textContent = `${formatDisplayDate(key)} 기록에 저장되었어요`;
       updateTodayNote();
     });
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   function renderLog() {
@@ -690,11 +811,14 @@
     keys.forEach(key => {
       const rec = records[key];
       const label = rec.word || rec.mood;
+      const reflectionHtml = rec.reflection
+        ? `<div class="log-reflection"><span class="log-reflection-tag">성찰</span>${escapeHtml(rec.reflection)}</div>`
+        : '';
       rows += `
         <tr>
           <td class="log-date">${formatDisplayDate(key)}</td>
           <td><span class="mood-chip"><span class="chip-dot" data-q="${rec.mood}"></span>${label}</span></td>
-          <td class="log-quote">${rec.quoteText}</td>
+          <td class="log-quote">${rec.quoteText}${reflectionHtml}</td>
           <td><button class="del-link" data-key="${key}">삭제</button></td>
         </tr>
       `;
@@ -729,6 +853,107 @@
 
   toggleBtn.addEventListener('click', openLog);
   closeLogBtn.addEventListener('click', closeLog);
+
+  // ---- 감정 캘린더 ----
+  const quadLabelFull = {
+    red: '화나고 불안', yellow: '신나고 행복', blue: '지치고 우울', green: '편안하고 평온'
+  };
+
+  const today = new Date();
+  let calYear = today.getFullYear();
+  let calMonth = today.getMonth(); // 0-11
+
+  function changeMonth(delta) {
+    calMonth += delta;
+    if (calMonth < 0) { calMonth = 11; calYear -= 1; }
+    if (calMonth > 11) { calMonth = 0; calYear += 1; }
+    renderChart();
+  }
+
+  function showCalDetail(dateStr) {
+    const rec = records[dateStr];
+    const detail = document.getElementById('calDetail');
+    if (!detail) return;
+    if (!rec) { detail.innerHTML = ''; return; }
+    const label = rec.word || rec.mood;
+    const reflectionHtml = rec.reflection
+      ? `<div class="log-reflection"><span class="log-reflection-tag">성찰</span>${escapeHtml(rec.reflection)}</div>`
+      : '';
+    detail.innerHTML = `
+      <div class="cal-detail-card">
+        <span class="log-date">${formatDisplayDate(dateStr)}</span>
+        <div class="mood-chip" style="margin-top:6px;"><span class="chip-dot" data-q="${rec.mood}"></span>${label}</div>
+        <p class="log-quote" style="margin-top:10px;">${rec.quoteText}${reflectionHtml}</p>
+      </div>
+    `;
+  }
+
+  function renderChart() {
+    const body = document.getElementById('chartBody');
+    const year = calYear, month = calMonth;
+    const firstWeekday = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const monthLabel = `${year}년 ${month + 1}월`;
+    const weekdayNames = ['일', '월', '화', '수', '목', '금', '토'];
+
+    let cells = '';
+    for (let i = 0; i < firstWeekday; i++) {
+      cells += `<div class="cal-cell empty"></div>`;
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const rec = records[dateStr];
+      const isToday = dateStr === getTodayKey();
+      const classes = ['cal-cell'];
+      if (rec) classes.push('has-mood');
+      if (isToday) classes.push('is-today');
+      const qAttr = rec ? ` data-q="${rec.mood}"` : '';
+      cells += `<button type="button" class="${classes.join(' ')}" data-date="${dateStr}"${qAttr}>${d}</button>`;
+    }
+
+    const weekdayHeaders = weekdayNames.map(w => `<div class="cal-weekday">${w}</div>`).join('');
+    const hasAnyRecord = Object.keys(records).length > 0;
+
+    body.innerHTML = `
+      <div class="cal-header">
+        <button class="cal-nav" id="calPrev" aria-label="이전 달">&#8249;</button>
+        <p class="cal-month-label">${monthLabel}</p>
+        <button class="cal-nav" id="calNext" aria-label="다음 달">&#8250;</button>
+      </div>
+      <div class="cal-grid cal-weekdays">${weekdayHeaders}</div>
+      <div class="cal-grid">${cells}</div>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-dot" data-q="red"></span>${quadLabelFull.red}</span>
+        <span class="legend-item"><span class="legend-dot" data-q="yellow"></span>${quadLabelFull.yellow}</span>
+        <span class="legend-item"><span class="legend-dot" data-q="blue"></span>${quadLabelFull.blue}</span>
+        <span class="legend-item"><span class="legend-dot" data-q="green"></span>${quadLabelFull.green}</span>
+      </div>
+      ${!hasAnyRecord ? '<div class="log-empty">아직 기록된 감정이 없어요.<br>감정을 기록하면 여기 캘린더에 색으로 표시돼요.</div>' : '<div id="calDetail"></div>'}
+    `;
+
+    document.getElementById('calPrev').addEventListener('click', () => changeMonth(-1));
+    document.getElementById('calNext').addEventListener('click', () => changeMonth(1));
+    body.querySelectorAll('.cal-cell.has-mood').forEach(cell => {
+      cell.addEventListener('click', () => showCalDetail(cell.dataset.date));
+    });
+  }
+
+  const chartToggleBtn = document.getElementById('chartToggleBtn');
+  const chartView = document.getElementById('chartView');
+  const closeChartBtn = document.getElementById('closeChartBtn');
+
+  function openChart() {
+    chartView.classList.remove('hidden');
+    renderChart();
+    window.scrollTo(0, 0);
+  }
+
+  function closeChart() {
+    chartView.classList.add('hidden');
+  }
+
+  chartToggleBtn.addEventListener('click', openChart);
+  closeChartBtn.addEventListener('click', closeChart);
 
   // ---- 홈 화면에 추가 안내 ----
   const installOverlay = document.getElementById('installModalOverlay');
