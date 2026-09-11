@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지금, 이 마음에게</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  :root {
+    --ink: #EFEAF6;
+    --ink-soft: #C9BFDC;
+    --line: rgba(255,255,255,0.22);
+
+    --red: #E07A6C;
+    --red-bg: rgba(224,122,108,0.28);
+    --yellow: #E8C24E;
+    --yellow-bg: rgba(232,194,78,0.28);
+    --blue: #7C93D1;
+    --blue-bg: rgba(124,147,209,0.28);
+    --green: #82B98D;
+    --green-bg: rgba(130,185,141,0.28);
+
+    --current: var(--ink);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 44px 18px 90px;
+    position: relative;
+    overflow-x: hidden;
+    background: radial-gradient(ellipse 90% 60% at 20% 0%, #4B3B73 0%, transparent 55%),
+                radial-gradient(ellipse 80% 60% at 85% 15%, #6E4C7E 0%, transparent 55%),
+                radial-gradient(ellipse 90% 70% at 50% 100%, #7A5C82 0%, transparent 60%),
+                linear-gradient(160deg, #211A3B 0%, #3B2C5C 35%, #5C4270 65%, #7C5470 100%);
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(2px 2px at 12% 22%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1.5px 1.5px at 26% 68%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(2px 2px at 41% 12%, rgba(255,255,255,0.45), transparent),
+      radial-gradient(1.5px 1.5px at 58% 78%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 73% 34%, rgba(255,255,255,0.45), transparent),
+      radial-gradient(1.5px 1.5px at 88% 58%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(2px 2px at 95% 88%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 8% 90%, rgba(255,255,255,0.3), transparent);
+    opacity: 0.9;
+  }
+
+  body::after {
+    content: "";
+    position: fixed; top: -10%; left: -10%;
+    width: 55vw; height: 55vw; max-width: 620px; max-height: 620px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,169,194,0.32) 0%, transparent 70%);
+    filter: blur(40px); z-index: 0; pointer-events: none;
+  }
+
+  .page { width: 100%; max-width: 720px; position: relative; z-index: 1; }
+
+  .top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 26px; }
+  header { text-align: left; flex: 1; }
+
+  h1 {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.45;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-shadow: 0 0 24px rgba(198,168,232,0.35);
+  }
+
+  header p { font-size: 14.5px; color: var(--ink-soft); margin: 0 0 4px; }
+  .source-note { font-size: 12px; color: var(--ink-soft); opacity: 0.75; margin: 0; }
+  .today-note { margin-top: 10px; font-size: 14px; color: var(--ink-soft); }
+  .today-note strong { color: var(--ink); font-weight: 700; }
+
+  .toggle-btn {
+    appearance: none; flex-shrink: 0;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px; font-weight: 700;
+    border-radius: 14px; padding: 12px 16px;
+    cursor: pointer; white-space: nowrap;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .toggle-btn:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+
+  .meter-row { display: flex; align-items: stretch; gap: 10px; margin-bottom: 32px; }
+
+  .axis-y {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 34px;
+    flex-shrink: 0;
+    padding: 6px 0;
+  }
+
+  .axis-end { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+  .arrow { color: var(--ink-soft); font-size: 13px; line-height: 1; }
+
+  .axis-y .axis-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .axis-line { flex: 1; width: 1px; background: var(--line); margin: 6px 0; min-height: 24px; }
+
+  .meter-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  .axis-x {
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+    padding: 0 2px;
+  }
+
+  .axis-end-x { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+  .axis-x .axis-text-x {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .axis-line-x { flex: 1; height: 1px; background: var(--line); margin: 0 10px; min-width: 16px; }
+  .meter-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .meter-wrap { grid-template-columns: 1fr; } .meter-row { gap: 6px; } .axis-y { width: 26px; } }
+
+  .quadrant {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+    padding: 12px; border-radius: 16px; border: 1px solid var(--line);
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+
+  .quadrant[data-q="red"] { border-color: rgba(224,122,108,0.35); }
+  .quadrant[data-q="yellow"] { border-color: rgba(232,194,78,0.35); }
+  .quadrant[data-q="blue"] { border-color: rgba(124,147,209,0.35); }
+  .quadrant[data-q="green"] { border-color: rgba(130,185,141,0.35); }
+
+  .word-btn {
+    appearance: none; border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 9px; padding: 7px 3px;
+    font-family: 'Noto Sans KR', sans-serif; font-size: 12px; font-weight: 700;
+    color: #fff; cursor: pointer; text-align: center; line-height: 1.3;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  }
+
+  .word-btn .en { display: block; font-size: 9px; font-weight: 500; opacity: 0.85; margin-top: 2px; color: rgba(255,255,255,0.9); }
+  .word-btn:hover { transform: translateY(-2px); filter: brightness(1.12); }
+
+  /* 원본 무드 미터 사진 속 색감을 살린 행별 색상 (위쪽 = 진한 색, 아래쪽 = 옅은 색) */
+  .quadrant[data-q="red"] .word-btn[data-row="0"] { background: #8B2942; }
+  .quadrant[data-q="red"] .word-btn[data-row="1"] { background: #A33131; }
+  .quadrant[data-q="red"] .word-btn[data-row="2"] { background: #C23B2E; }
+  .quadrant[data-q="red"] .word-btn[data-row="3"] { background: #D9622B; }
+  .quadrant[data-q="red"] .word-btn[data-row="4"] { background: #E0793B; }
+
+  .quadrant[data-q="yellow"] .word-btn { color: #4A3B10; }
+  .quadrant[data-q="yellow"] .word-btn .en { color: rgba(74,59,16,0.75); }
+  .quadrant[data-q="yellow"] .word-btn[data-row="0"] { background: #EDE07A; }
+  .quadrant[data-q="yellow"] .word-btn[data-row="1"] { background: #EAD35C; }
+  .quadrant[data-q="yellow"] .word-btn[data-row="2"] { background: #E6C24A; }
+  .quadrant[data-q="yellow"] .word-btn[data-row="3"] { background: #E3B93E; }
+  .quadrant[data-q="yellow"] .word-btn[data-row="4"] { background: #DFAA3A; }
+
+  .quadrant[data-q="blue"] .word-btn[data-row="0"] { background: #4E6FA8; }
+  .quadrant[data-q="blue"] .word-btn[data-row="1"] { background: #45619C; }
+  .quadrant[data-q="blue"] .word-btn[data-row="2"] { background: #3D5490; }
+  .quadrant[data-q="blue"] .word-btn[data-row="3"] { background: #354876; }
+  .quadrant[data-q="blue"] .word-btn[data-row="4"] { background: #2C3C66; }
+
+  .quadrant[data-q="green"] .word-btn[data-row="0"] { background: #9CB86B; }
+  .quadrant[data-q="green"] .word-btn[data-row="1"] { background: #8AB06A; }
+  .quadrant[data-q="green"] .word-btn[data-row="2"] { background: #74A66C; }
+  .quadrant[data-q="green"] .word-btn[data-row="3"] { background: #5E9A67; }
+  .quadrant[data-q="green"] .word-btn[data-row="4"] { background: #4A8C5E; }
+
+  .word-btn.selected {
+    outline: 2px solid #fff;
+    outline-offset: 1px;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 20px -4px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+
+  .word-btn:focus-visible, .toggle-btn:focus-visible, .again-btn:focus-visible, .save-btn:focus-visible {
+    outline: 2px solid var(--ink); outline-offset: 2px;
+  }
+
+  .stage { min-height: 240px; display: flex; align-items: center; }
+
+  .placeholder {
+    width: 100%; text-align: center; color: var(--ink-soft); font-size: 16px;
+    padding: 50px 20px; border: 1px dashed var(--line); border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+
+  .quote-card {
+    width: 100%;
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-left: 3px solid var(--current);
+    border-radius: 6px 24px 24px 6px;
+    padding: 36px 30px;
+    opacity: 0; transform: translateY(8px);
+    animation: rise 0.6s ease forwards;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.45);
+  }
+
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+
+  .quote-label { font-size: 14px; font-weight: 700; color: var(--current); margin: 0 0 18px; letter-spacing: 0.02em; }
+
+  .quote-text {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 26px; line-height: 1.8; font-weight: 700;
+    color: var(--ink); margin: 0 0 28px; letter-spacing: -0.01em;
+    text-shadow: 0 0 20px rgba(0,0,0,0.2);
+  }
+
+  .quote-text .hl { color: var(--current); }
+
+  .card-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+
+  .again-btn {
+    appearance: none; border: none; background: none; color: var(--current);
+    font-size: 16px; font-weight: 700; cursor: pointer; padding: 10px 0;
+    border-bottom: 1px solid var(--current);
+  }
+  .again-btn:hover { opacity: 0.75; }
+
+  .save-btn {
+    appearance: none; border: 1px solid var(--current); background: transparent; color: var(--current);
+    font-size: 15px; font-weight: 700; cursor: pointer; padding: 10px 18px; border-radius: 12px;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .save-btn:hover { background: var(--current); color: #241B3A; }
+  .save-msg { font-size: 14px; color: var(--ink-soft); }
+
+  @media (max-width: 420px) { .quote-text { font-size: 21px; } h1 { font-size: 23px; } }
+
+  .log-panel {
+    background: rgba(255,255,255,0.10);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 22px; padding: 26px 22px;
+    box-shadow: 0 20px 60px -20px rgba(0,0,0,0.45);
+  }
+
+  .log-title { font-family: 'Nanum Myeongjo', serif; font-size: 21px; font-weight: 700; margin: 0 0 18px; color: var(--ink); }
+  .log-empty { color: var(--ink-soft); font-size: 15px; padding: 20px 0; text-align: center; }
+
+  table.log-table { width: 100%; border-collapse: collapse; }
+  .log-table th { text-align: left; font-size: 13px; font-weight: 700; color: var(--ink-soft); padding: 0 8px 12px; border-bottom: 1px solid var(--line); }
+  .log-table td { font-size: 14px; padding: 13px 8px; border-bottom: 1px solid rgba(255,255,255,0.12); vertical-align: top; color: var(--ink); }
+  .log-table tr:last-child td { border-bottom: none; }
+  .log-date { white-space: nowrap; color: var(--ink-soft); font-weight: 500; }
+  .mood-chip { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; }
+  .chip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .chip-dot[data-q="red"] { background: var(--red); }
+  .chip-dot[data-q="yellow"] { background: var(--yellow); }
+  .chip-dot[data-q="blue"] { background: var(--blue); }
+  .chip-dot[data-q="green"] { background: var(--green); }
+  .log-quote { font-family: 'Nanum Myeongjo', serif; line-height: 1.6; }
+  .del-link { appearance: none; border: none; background: none; color: var(--ink-soft); font-size: 13px; cursor: pointer; text-decoration: underline; padding: 0; }
+  .del-link:hover { color: var(--ink); }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top-row">
+    <header>
+      <h1>지금, 어떤 마음이신가요</h1>
+      <p>무드 미터의 감정 단어 중에서 오늘의 마음을 골라보세요</p>
+      <p class="source-note">출처: 무드 미터(Mood Meter) — &lt;감정의 발견&gt;, 마크 브래킷</p>
+      <div class="today-note" id="todayNote"></div>
+    </header>
+    <button class="toggle-btn" id="toggleBtn">기록 보기</button>
+  </div>
+
+  <div id="mainView">
+    <div class="meter-row">
+      <div class="axis-y">
+        <div class="axis-end">
+          <span class="arrow">▲</span>
+          <span class="axis-text">활력 높음</span>
+        </div>
+        <div class="axis-line"></div>
+        <div class="axis-end">
+          <span class="axis-text">활력 낮음</span>
+          <span class="arrow">▼</span>
+        </div>
+      </div>
+      <div class="meter-col">
+        <div class="meter-wrap" id="meterWrap">
+          <div class="quadrant" data-q="red" id="q-red"></div>
+          <div class="quadrant" data-q="yellow" id="q-yellow"></div>
+          <div class="quadrant" data-q="blue" id="q-blue"></div>
+          <div class="quadrant" data-q="green" id="q-green"></div>
+        </div>
+        <div class="axis-x">
+          <div class="axis-end-x">
+            <span class="arrow">◀</span>
+            <span class="axis-text-x">쾌적함 낮음</span>
+          </div>
+          <div class="axis-line-x"></div>
+          <div class="axis-end-x">
+            <span class="axis-text-x">쾌적함 높음</span>
+            <span class="arrow">▶</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="placeholder">감정 단어를 눌러보시면<br>그 마음에게 건네는 문장을 보여드릴게요</div>
+    </div>
+  </div>
+
+  <div id="logView" class="hidden">
+    <div class="log-panel">
+      <p class="log-title">나의 감정 기록</p>
+      <div id="logBody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const moodWords = {
+    red: [
+      {ko:'격분한', en:'Enraged'}, {ko:'공황에 빠진', en:'Panicked'}, {ko:'스트레스 받는', en:'Stressed'}, {ko:'초조한', en:'Jittery'}, {ko:'충격받은', en:'Shocked'},
+      {ko:'격노한', en:'Livid'}, {ko:'몹시 화가 난', en:'Furious'}, {ko:'좌절한', en:'Frustrated'}, {ko:'신경이 날카로운', en:'Tense'}, {ko:'망연자실한', en:'Stunned'},
+      {ko:'화가 치밀어 오르는', en:'Fuming'}, {ko:'겁먹은', en:'Frightened'}, {ko:'화난', en:'Angry'}, {ko:'초조해하는', en:'Nervous'}, {ko:'안절부절못하는', en:'Restless'},
+      {ko:'불안한', en:'Anxious'}, {ko:'우려하는', en:'Apprehensive'}, {ko:'근심하는', en:'Worried'}, {ko:'짜증나는', en:'Irritated'}, {ko:'거슬리는', en:'Annoyed'},
+      {ko:'불쾌한', en:'Repulsed'}, {ko:'골치 아픈', en:'Troubled'}, {ko:'염려하는', en:'Concerned'}, {ko:'마음이 불편한', en:'Uneasy'}, {ko:'언짢은', en:'Peeved'}
+    ],
+    yellow: [
+      {ko:'놀란', en:'Surprised'}, {ko:'긍정적인', en:'Upbeat'}, {ko:'흥겨운', en:'Festive'}, {ko:'아주 신나는', en:'Exhilarated'}, {ko:'황홀한', en:'Ecstatic'},
+      {ko:'들뜬', en:'Hyper'}, {ko:'쾌활한', en:'Cheerful'}, {ko:'동기 부여된', en:'Motivated'}, {ko:'영감을 받은', en:'Inspired'}, {ko:'의기양양한', en:'Elated'},
+      {ko:'기운이 넘치는', en:'Energized'}, {ko:'활발한', en:'Lively'}, {ko:'흥분한', en:'Excited'}, {ko:'낙관적인', en:'Optimistic'}, {ko:'열광하는', en:'Enthusiastic'},
+      {ko:'만족스러운', en:'Pleased'}, {ko:'집중하는', en:'Focused'}, {ko:'행복한', en:'Happy'}, {ko:'자랑스러운', en:'Proud'}, {ko:'짜릿한', en:'Thrilled'},
+      {ko:'유쾌한', en:'Pleasant'}, {ko:'기쁜', en:'Joyful'}, {ko:'희망찬', en:'Hopeful'}, {ko:'재미있는', en:'Playful'}, {ko:'더없이 행복한', en:'Blissful'}
+    ],
+    blue: [
+      {ko:'역겨운', en:'Disgusted'}, {ko:'침울한', en:'Glum'}, {ko:'실망스러운', en:'Disappointed'}, {ko:'의욕 없는', en:'Down'}, {ko:'냉담한', en:'Apathetic'},
+      {ko:'비관적인', en:'Pessimistic'}, {ko:'시무룩한', en:'Morose'}, {ko:'낙담한', en:'Discouraged'}, {ko:'슬픈', en:'Sad'}, {ko:'지루한', en:'Bored'},
+      {ko:'소외된', en:'Alienated'}, {ko:'비참한', en:'Miserable'}, {ko:'쓸쓸한', en:'Lonely'}, {ko:'기죽은', en:'Disheartened'}, {ko:'피곤한', en:'Tired'},
+      {ko:'의기소침한', en:'Despondent'}, {ko:'우울한', en:'Depressed'}, {ko:'뚱한', en:'Sullen'}, {ko:'기진맥진한', en:'Exhausted'}, {ko:'지친', en:'Fatigued'},
+      {ko:'절망하는', en:'Despairing'}, {ko:'가망 없는', en:'Hopeless'}, {ko:'고독한', en:'Desolate'}, {ko:'소모된', en:'Spent'}, {ko:'진이 빠진', en:'Drained'}
+    ],
+    green: [
+      {ko:'속 편한', en:'At Ease'}, {ko:'태평한', en:'Easygoing'}, {ko:'자족하는', en:'Content'}, {ko:'다정한', en:'Loving'}, {ko:'충만한', en:'Fulfilled'},
+      {ko:'평온한', en:'Calm'}, {ko:'안전한', en:'Secure'}, {ko:'만족스러운', en:'Satisfied'}, {ko:'감사하는', en:'Grateful'}, {ko:'감동적인', en:'Touched'},
+      {ko:'여유로운', en:'Relaxed'}, {ko:'차분한', en:'Chill'}, {ko:'편안한', en:'Restful'}, {ko:'축복받은', en:'Blessed'}, {ko:'안정적인', en:'Balanced'},
+      {ko:'한가로운', en:'Mellow'}, {ko:'생각에 잠긴', en:'Thoughtful'}, {ko:'평화로운', en:'Peaceful'}, {ko:'편한', en:'Comfortable'}, {ko:'근심 걱정 없는', en:'Carefree'},
+      {ko:'나른한', en:'Sleepy'}, {ko:'흐뭇한', en:'Complacent'}, {ko:'고요한', en:'Tranquil'}, {ko:'안락한', en:'Cozy'}, {ko:'안온한', en:'Serene'}
+    ]
+  };
+
+  // 템플릿 안의 {w}는 클릭한 감정 단어로 치환됩니다.
+  // 감정 단어가 항상 문장 안에 그대로 들어가기 때문에,
+  // 서로 다른 감정 단어끼리는 완전히 같은 문장이 나오지 않습니다.
+  const templates = {
+    red: [
+      "지금 마음에 있는 “{w}”, 그 감정 그대로 존중받을 자격이 있습니다.",
+      "“{w}”이라는 감정이 든다는 건, 당신이 그만큼 신경 쓰고 있다는 뜻이에요.",
+      "지금 느끼는 “{w}”, 그 마음을 굳이 억누르지 않아도 괜찮습니다.",
+      "“{w}”, 이 감정도 결국 지나가는 파도일 뿐입니다.",
+      "지금 이 “{w}” 감정 뒤에는, 당신이 지키고 싶은 무언가가 있을지도 몰라요.",
+      "숨을 한 번 크게 들이쉬어보세요. “{w}” 그 감정이 조금씩 가라앉을 거예요.",
+      "“{w}”, 그 마음을 느낀다고 해서 당신이 약한 건 아닙니다.",
+      "“{w}”, 지금 이 감정을 느끼는 것도 상황을 진지하게 대하고 있다는 신호입니다.",
+      "완벽하게 대처하지 않아도 괜찮아요. “{w}”, 그 자체로 충분히 인정받을 만합니다.",
+      "“{w}”, 이 감정이 크게 느껴질수록 당신에게 그만큼 중요한 일이라는 뜻이에요.",
+      "지금 “{w}”, 그 마음을 잠시 그대로 느껴봐도 괜찮습니다.",
+      "그 “{w}” 감정을 다른 사람에게 곧바로 쏟아내지 않아도, 감정 자체는 정당합니다.",
+      "“{w}”, 이 감정이 당신을 정의하지는 않습니다. 그저 지금 지나가는 중일 뿐이에요.",
+      "잠시 멈춰서 심호흡을 하면, “{w}” 그 마음이 조금은 편안해질 거예요.",
+      "지금 드는 “{w}” 감정, 그 뒤에 숨은 진짜 마음을 천천히 들여다봐도 괜찮습니다.",
+      "“{w}”, 이 감정을 느낀다고 해서 당신이 나쁜 사람이 되는 건 아닙니다.",
+      "지금 이 순간, “{w}” 그 감정을 견디고 있는 당신은 이미 충분히 애쓰고 있는 중입니다.",
+      "“{w}”, 그 마음이 들 때일수록 스스로에게 더 다정한 말을 건네주세요.",
+      "지금 당장 답을 내리지 않아도 됩니다. “{w}” 그 감정은 잠시 두어도 괜찮아요.",
+      "“{w}” 그 감정 안에도, 당신을 지키려는 마음이 담겨 있습니다."
+    ],
+    yellow: [
+      "지금 느끼는 “{w}”, 그 마음은 온전히 당신이 만들어낸 것입니다.",
+      "“{w}”, 이 기분을 아껴 쓰지 않아도 됩니다. 마음껏 느껴도 괜찮아요.",
+      "오늘의 “{w}” 그 감정이 오래 남아 다른 날의 힘이 되어줄 거예요.",
+      "“{w}”, 이 좋은 감정도 연습이 됩니다. 자주 느낄수록 더 잘 느끼게 돼요.",
+      "이 “{w}” 감정을 굳이 설명하지 않아도 괜찮습니다. 그냥 누리세요.",
+      "“{w}”, 이런 마음은 거창한 이유가 없어도 찾아옵니다. 지금이 바로 그 증거예요.",
+      "당신의 “{w}” 그 마음은 주변 사람에게도 조용히 번져갑니다.",
+      "오늘 느낀 “{w}” 그 기분을 내일의 나에게 빌려줘도 좋아요.",
+      "“{w}”, 지금 이 순간을 사진처럼 마음에 담아두세요.",
+      "“{w}”, 이 감정을 느낄 자격을 스스로 의심하지 마세요.",
+      "작은 즐거움을 알아차리는 사람이 결국 “{w}” 그 순간을 더 자주 만납니다.",
+      "이 “{w}” 기분이 오래가지 않아도 괜찮아요. 지금은 충분히 진짜입니다.",
+      "당신이 “{w}” 그 마음일 때, 세상이 아주 조금 더 밝아집니다.",
+      "“{w}”, 이런 날을 기록해두면 흐린 날에 꺼내볼 수 있어요.",
+      "지금의 “{w}” 그 감정은 앞으로 올 좋은 일들의 예고편일지도 몰라요.",
+      "“{w}”, 이 감정은 나눌수록 줄어들지 않고 오히려 더 커집니다.",
+      "오늘 하루, 스스로에게 “{w}” 그 마음을 느낄 만큼 잘했다고 말해줘도 됩니다.",
+      "“{w}”, 이 감정을 느끼는 능력도 당신의 재능입니다.",
+      "이 순간의 “{w}” 그 마음을 굳이 불안해하지 않아도 괜찮아요.",
+      "당신은 지금 “{w}” 그 감정을 누릴 만큼 충분히 애써왔습니다."
+    ],
+    blue: [
+      "“{w}”, 이 감정을 느낀다는 건 당신이 무언가를 진심으로 아꼈다는 뜻입니다.",
+      "지금 “{w}” 그 마음이 든다면, 참지 않고 그대로 느껴도 괜찮아요.",
+      "이 “{w}” 마음이 영원하지 않다는 것을, 당신의 몸이 먼저 알고 있어요.",
+      "오늘은 그냥 “{w}” 그 상태를 버텨내는 것만으로도 충분합니다.",
+      "“{w}”, 이런 감정은 약함의 증거가 아니라 마음이 살아있다는 증거예요.",
+      "지금 느끼는 “{w}” 그 무거움을 굳이 서둘러 밀어내지 않아도 괜찮아요.",
+      "당신은 지금도 충분히 애쓰고 있습니다. “{w}”, 그것만으로 충분해요.",
+      "“{w}” 그런 날엔, 아무것도 안 하는 것도 괜찮은 선택이에요.",
+      "혼자라고 느껴져도, 지금 “{w}” 이 순간 당신을 걱정하는 마음들이 있습니다.",
+      "“{w}”, 이 감정을 견디는 것도 하나의 용기입니다.",
+      "지금 느끼는 “{w}” 그 아픔이 당신의 전부를 정의하지는 않습니다.",
+      "지금은 “{w}” 흐린 날씨일 뿐, 계절 자체가 바뀐 건 아니에요.",
+      "쉬는 것은 멈추는 것이 아니라, “{w}” 그 마음 다음을 위한 준비입니다.",
+      "지금 “{w}” 그렇게 느껴진다는 건, 그동안 그만큼 애써왔다는 증거예요.",
+      "오늘은 아무것도 하지 않아도, “{w}” 그 상태의 당신 가치는 변하지 않습니다.",
+      "“{w}”, 이 감정은 게으름이 아니라 몸과 마음이 보내는 정직한 신호입니다.",
+      "잠시 멈춰 서도 괜찮습니다. “{w}”, 길을 잃은 게 아니라 숨을 고르는 것뿐이에요.",
+      "완벽하게 해내지 않아도, “{w}” 오늘 하루를 버틴 것만으로 충분합니다.",
+      "“{w}” 그 마음에게 필요한 건 채찍질이 아니라 다정한 휴식입니다.",
+      "당신은 기계가 아니라 사람입니다. “{w}” 그런 날엔 재충전할 시간이 필요해요."
+    ],
+    green: [
+      "지금 이 “{w}”, 그 마음은 애쓰지 않아도 괜찮다는 마음이 만들어낸 것입니다.",
+      "“{w}”, 이런 순간은 특별한 이유 없이도 찾아옵니다. 지금이 그 증거예요.",
+      "“{w}” 그 마음도 하나의 성취입니다. 당신은 지금 잘 쉬고 있는 거예요.",
+      "여유로운 지금 “{w}” 이 순간을, 굳이 서둘러 다음으로 넘기지 않아도 됩니다.",
+      "“{w}”, 이 감정을 느낀다는 건 지금 이 순간 안전하다는 몸의 신호입니다.",
+      "잔잔한 “{w}” 그 마음은 소란한 마음만큼이나 소중한 하루의 일부입니다.",
+      "지금 느끼는 “{w}” 그 마음을 굳이 의심하지 않아도 괜찮아요.",
+      "“{w}” 그런 하루는, 그 자체로 충분히 잘 살아낸 하루입니다.",
+      "가만히 “{w}” 이 시간에 머무는 것도, 당신에게 필요한 시간입니다.",
+      "“{w}”, 차분한 마음은 앞으로 올 일들을 더 선명하게 볼 수 있게 해줍니다.",
+      "지금의 “{w}” 그 감정을, 애써 불안으로 바꾸지 않아도 됩니다.",
+      "오늘 느끼는 “{w}” 그 마음을, 당신은 스스로 만들어낸 거예요.",
+      "“{w}” 그 고요함 속에서도 마음은 조용히 자라고 있습니다.",
+      "지금 이 순간 “{w}” 그 마음으로 만족하는 것이, 결국 가장 큰 행복입니다.",
+      "“{w}”, 이 감정을 느낀다는 건 당신이 자신을 잘 돌보고 있다는 뜻입니다.",
+      "이런 “{w}” 하루는 특별한 사건이 없어도 완성될 수 있습니다.",
+      "지금 느끼는 “{w}” 그 마음을 오래 붙잡아두어도 괜찮아요.",
+      "“{w}” 이 감정은 아무 일도 없어서가 아니라, 마음이 단단해져서 옵니다.",
+      "잔잔한 지금 “{w}” 이 순간에, 굳이 의미를 더하지 않아도 충분합니다.",
+      "“{w}” 그런 마음으로 보내는 하루도, 소중한 하루입니다."
+    ]
+  };
+
+  const quadLabel = { red: "당신에게", yellow: "당신에게", blue: "당신에게", green: "당신에게" };
+
+  let lastIndex = {}; // 단어별 마지막으로 보여준 템플릿 인덱스 (연속 중복 방지)
+  let records = {};
+
+  function buildWordGrid() {
+    Object.keys(moodWords).forEach(q => {
+      const container = document.getElementById('q-' + q);
+      container.innerHTML = moodWords[q].map((w, i) => `
+        <button class="word-btn" data-q="${q}" data-word="${w.ko}" data-row="${Math.floor(i/5)}">${w.ko}<span class="en">${w.en}</span></button>
+      `).join('');
+    });
+    document.querySelectorAll('.word-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.word-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        render(btn.dataset.q, btn.dataset.word);
+      });
+    });
+  }
+
+  function pickQuote(q, word) {
+    const list = templates[q];
+    const key = word; // 단어별로 마지막 인덱스를 따로 관리
+    let idx;
+    do { idx = Math.floor(Math.random() * list.length); }
+    while (list.length > 1 && idx === lastIndex[key]);
+    lastIndex[key] = idx;
+    return list[idx].split('{w}').join(word);
+  }
+
+  function getTodayKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function formatDisplayDate(dateStr) {
+    const [y,m,d] = dateStr.split('-').map(Number);
+    return new Date(y, m-1, d).toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'short' });
+  }
+
+  async function persistRecords() {
+    try { await window.storage.set('mood-records', JSON.stringify(records), false); }
+    catch (e) { console.error('저장 실패', e); }
+  }
+
+  function updateTodayNote() {
+    const note = document.getElementById('todayNote');
+    const rec = records[getTodayKey()];
+    note.innerHTML = rec ? `오늘 기록한 감정: <strong>${rec.word || rec.mood}</strong>` : '';
+  }
+
+  function render(q, word) {
+    const text = pickQuote(q, word);
+    const stage = document.getElementById('stage');
+    stage.innerHTML = `
+      <div class="quote-card" style="--current:var(--${q});">
+        <p class="quote-label">${word} ${quadLabel[q]}</p>
+        <p class="quote-text">${text}</p>
+        <div class="card-actions">
+          <button class="again-btn" id="again">다른 문장 보기</button>
+          <button class="save-btn" id="saveBtn">오늘 기록에 저장</button>
+          <span class="save-msg" id="saveMsg"></span>
+        </div>
+      </div>
+    `;
+    document.getElementById('again').addEventListener('click', () => render(q, word));
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const key = getTodayKey();
+      records[key] = { mood: q, word, quoteText: text, savedAt: new Date().toISOString() };
+      await persistRecords();
+      document.getElementById('saveMsg').textContent = `${formatDisplayDate(key)} 기록에 저장되었어요`;
+      updateTodayNote();
+    });
+  }
+
+  function renderLog() {
+    const body = document.getElementById('logBody');
+    const keys = Object.keys(records).sort().reverse();
+    if (keys.length === 0) {
+      body.innerHTML = '<div class="log-empty">아직 기록된 감정이 없어요.<br>감정 단어를 고르고 "오늘 기록에 저장"을 눌러보세요.</div>';
+      return;
+    }
+    let rows = '';
+    keys.forEach(key => {
+      const rec = records[key];
+      const label = rec.word || rec.mood;
+      rows += `
+        <tr>
+          <td class="log-date">${formatDisplayDate(key)}</td>
+          <td><span class="mood-chip"><span class="chip-dot" data-q="${rec.mood}"></span>${label}</span></td>
+          <td class="log-quote">${rec.quoteText}</td>
+          <td><button class="del-link" data-key="${key}">삭제</button></td>
+        </tr>
+      `;
+    });
+    body.innerHTML = `<table class="log-table"><thead><tr><th>날짜</th><th>감정</th><th>오늘의 문장</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+    body.querySelectorAll('.del-link').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const key = e.target.getAttribute('data-key');
+        delete records[key];
+        await persistRecords();
+        renderLog();
+        updateTodayNote();
+      });
+    });
+  }
+
+  const toggleBtn = document.getElementById('toggleBtn');
+  const mainView = document.getElementById('mainView');
+  const logView = document.getElementById('logView');
+  let showingLog = false;
+
+  toggleBtn.addEventListener('click', () => {
+    showingLog = !showingLog;
+    if (showingLog) {
+      mainView.classList.add('hidden');
+      logView.classList.remove('hidden');
+      toggleBtn.textContent = '기록 닫기';
+      renderLog();
+    } else {
+      mainView.classList.remove('hidden');
+      logView.classList.add('hidden');
+      toggleBtn.textContent = '기록 보기';
+    }
+  });
+
+  buildWordGrid();
+
+  (async () => {
+    try {
+      const res = await window.storage.get('mood-records', false);
+      records = res && res.value ? JSON.parse(res.value) : {};
+    } catch (e) { records = {}; }
+    updateTodayNote();
+  })();
+</script>
+</body>
+</html>
