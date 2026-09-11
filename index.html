@@ -757,8 +757,10 @@
     return new Date(y, m-1, d).toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'short' });
   }
 
+  const STORAGE_KEY = 'mood-quotes-records';
+
   async function persistRecords() {
-    try { await window.storage.set('mood-records', JSON.stringify(records), false); }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
     catch (e) { console.error('저장 실패', e); }
   }
 
@@ -1035,13 +1037,11 @@
 
   buildWordGrid();
 
-  (async () => {
-    try {
-      const res = await window.storage.get('mood-records', false);
-      records = res && res.value ? JSON.parse(res.value) : {};
-    } catch (e) { records = {}; }
-    updateTodayNote();
-  })();
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    records = saved ? JSON.parse(saved) : {};
+  } catch (e) { records = {}; }
+  updateTodayNote();
 </script>
 </body>
 </html>
