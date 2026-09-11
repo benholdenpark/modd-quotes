@@ -111,7 +111,24 @@
   .today-note { margin-top: 10px; font-size: 14px; color: var(--ink-soft); }
   .today-note strong { color: var(--ink); font-weight: 700; }
 
-  .header-btns { display: flex; gap: 8px; flex-shrink: 0; }
+  .header-btns { display: flex; gap: 8px; flex-shrink: 0; position: relative; }
+
+  .share-toast {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: rgba(30, 22, 48, 0.95);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 10px;
+    white-space: nowrap;
+    box-shadow: 0 10px 24px -10px rgba(0,0,0,0.5);
+    z-index: 10;
+  }
+  .share-toast.hidden { display: none; }
 
   .toggle-btn, .refresh-btn {
     appearance: none; flex-shrink: 0;
@@ -389,9 +406,10 @@
       <div class="today-note" id="todayNote"></div>
     </header>
     <div class="header-btns">
-      <button class="refresh-btn" id="installBtn" title="홈 화면에 추가" aria-label="홈 화면에 추가">&#8962;</button>
+      <button class="refresh-btn" id="shareBtn" title="공유하기" aria-label="공유하기">&#128228;</button>
       <button class="refresh-btn" id="refreshBtn" title="새로고침" aria-label="새로고침">&#8635;</button>
       <button class="toggle-btn" id="toggleBtn">기록 보기</button>
+      <span class="share-toast hidden" id="shareToast"></span>
     </div>
   </div>
 
@@ -712,8 +730,7 @@
   toggleBtn.addEventListener('click', openLog);
   closeLogBtn.addEventListener('click', closeLog);
 
-  // ---- 홈 화면에 추가 ----
-  const installBtn = document.getElementById('installBtn');
+  // ---- 홈 화면에 추가 안내 ----
   const installOverlay = document.getElementById('installModalOverlay');
   const installText = document.getElementById('installModalText');
   const closeInstallBtn = document.getElementById('closeInstallBtn');
@@ -750,7 +767,6 @@
     installOverlay.classList.remove('hidden');
   }
 
-  installBtn.addEventListener('click', openInstallGuide);
   document.getElementById('installHint').addEventListener('click', openInstallGuide);
 
   closeInstallBtn.addEventListener('click', () => {
@@ -759,6 +775,35 @@
 
   installOverlay.addEventListener('click', (e) => {
     if (e.target === installOverlay) installOverlay.classList.add('hidden');
+  });
+
+  // ---- 공유하기 ----
+  const shareBtn = document.getElementById('shareBtn');
+  const shareToast = document.getElementById('shareToast');
+
+  function showShareToast(msg) {
+    shareToast.textContent = msg;
+    shareToast.classList.remove('hidden');
+    clearTimeout(shareToast._t);
+    shareToast._t = setTimeout(() => shareToast.classList.add('hidden'), 2400);
+  }
+
+  shareBtn.addEventListener('click', async () => {
+    const shareData = {
+      title: '지금, 이 마음에게',
+      text: '오늘의 감정에 어울리는 문장을 찾아보세요.',
+      url: location.href
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (e) { /* 취소 등은 무시 */ }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(location.href);
+      showShareToast('링크가 복사되었어요');
+    } catch (e) {
+      showShareToast('이 환경에서는 공유가 지원되지 않아요');
+    }
   });
 
   buildWordGrid();
